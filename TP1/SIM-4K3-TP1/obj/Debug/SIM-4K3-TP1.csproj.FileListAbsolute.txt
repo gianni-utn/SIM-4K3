@@ -1,0 +1,10 @@
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\bin\Debug\SIM-4K3-TP1.exe.config
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\bin\Debug\SIM-4K3-TP1.exe
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\bin\Debug\SIM-4K3-TP1.pdb
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\obj\Debug\SIM-4K3-TP1.csprojAssemblyReference.cache
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\obj\Debug\SIM_4K3_TP1.Form1.resources
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\obj\Debug\SIM_4K3_TP1.Properties.Resources.resources
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\obj\Debug\SIM-4K3-TP1.csproj.GenerateResource.cache
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\obj\Debug\SIM-4K3-TP1.csproj.CoreCompileInputs.cache
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\obj\Debug\SIM-4K3-TP1.exe
+C:\Users\Gianni\source\repos\SIM-4K3\TP1\SIM-4K3-TP1\obj\Debug\SIM-4K3-TP1.pdb
