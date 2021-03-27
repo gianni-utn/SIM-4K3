@@ -3,8 +3,8 @@
 namespace SIM_4K3_TP1.Clases
 {
 	public class ResultadoDeValidacion {
-		private bool esValido;
-		private string mensajeDeError;
+		public bool esValido;
+		public string mensajeDeError;
 
 		public ResultadoDeValidacion(bool esValido, string mensajeDeError) {
 			this.esValido = esValido;

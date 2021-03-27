@@ -16,24 +16,27 @@ namespace SIM_4K3_TP1.Clases
 		public ResultadoDeValidacion validar(string semilla, string a, string m) {
 
 			try {
-				this.semilla = this.parsearInt(this.semilla);
-				this.a = this.parsearInt(this.a);
-				this.m = this.parsearInt(this.m);
+				this.semilla = this.parsearInt(semilla);
+				this.a = this.parsearInt(a);
+				this.m = this.parsearInt(m);
 			} catch {
-				return new ResultadoDeValidacion(false, 'Alguno de los valores no es un entero');
+				return new ResultadoDeValidacion(false, "Alguno de los valores no es un entero");
 			}
 
-			if (!this.validarM()) {
-				return new ResultadoDeValidacion(false, 'm = 2g (con g un número entero positivos)');
+			if (!this.validarM())
+			{
+				return new ResultadoDeValidacion(false, "m = 2g (con g un número entero positivos)");
 			}
-			if (!this.validarA()) {
-				return new ResultadoDeValidacion(false, 'a = 3 + 8.k (con k un número entero positivos)');
+			if (!this.validarA())
+			{
+				return new ResultadoDeValidacion(false, "a = 3 + 8.k (con k un número entero positivos)");
 			}
-			if (!this.validarSemilla()) {
-				return new ResultadoDeValidacion(false, 'La semilla debe ser un número impar');
+			if (!this.validarSemilla())
+			{
+				return new ResultadoDeValidacion(false, "La semilla debe ser un número impar");
 			}
 
-			return new ResultadoDeValidacion(true, '');
+			return new ResultadoDeValidacion(true, "");
 		}
 
 		private bool validarM() {

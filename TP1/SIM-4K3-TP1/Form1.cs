@@ -7,17 +7,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 using SIM_4K3_TP1.Clases;
 
 namespace SIM_4K3_TP1
 {
     public partial class Form1 : Form
     {
+        const String FRECUENCIA_OBSERVADA = "Frecuencia Observada";
+        const String FRECUENCIA_ESPERADA = "Frecuencia Esperada";
+
         List<string> numeros = new List<string>();
-        List<double> numerosDouble = new List<double>();
         Generador generador = new Generador();
-        Validador validador = new Validador();
         List<Intervalo> intervalos = new List<Intervalo>();
+        ValidadorCongruencialLineal validadorLineal = new ValidadorCongruencialLineal();
+        ValidadorCongruencialMultiplicativo validadorMultiplicativo = new ValidadorCongruencialMultiplicativo();
 
         int Xn = 0;
 
@@ -184,6 +188,7 @@ namespace SIM_4K3_TP1
                 }
 
                 // validacion c
+                ResultadoDeValidacion resultadoValidacion = new ResultadoDeValidacion(true, "");
                 if (metodoSeleccionado != "Congruencial multiplicativo")
                 {
                     if (!validarEnteroYPositivo(ref mensajeError, txt_c.Text))
@@ -192,6 +197,17 @@ namespace SIM_4K3_TP1
                         mensajeError = "El valor de \"c\" debe ser entero y positivo.";
                         return false;
                     }
+                    /// validar lineal
+                    resultadoValidacion = validadorLineal.validar(txt_m.Text, txt_a.Text, txt_c.Text);
+                }
+                else {
+                    /// validar multiplicatitivo
+                    resultadoValidacion = validadorMultiplicativo.validar(txt_semilla.Text, txt_a.Text, txt_m.Text);
+                }
+
+                if (!resultadoValidacion.esValido) {
+                    mensajeError = resultadoValidacion.mensajeDeError;
+                    return false;
                 }
             }
 
@@ -221,7 +237,7 @@ namespace SIM_4K3_TP1
                     return false;
                 }
 
-                if (cantidad <= 0)
+                if (cantidad < 0)
                 {
                     mensajeError = "La cantidad debe ser un número mayor a cero";
                     return false;
@@ -230,5 +246,159 @@ namespace SIM_4K3_TP1
 
             return true;
         }
+
+        private void label7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnRealizarTest_Click(object sender, EventArgs e)
+        {
+            intervalos = new List<Intervalo>();
+
+            int numeroDeIntervalos = int.Parse(cboCantIntervalos.SelectedItem.ToString());
+            int cantidadDeNumerosAGenerar = int.Parse(txtCantidad.Text);
+
+            double tamanioIntervalo = Math.Round(1f / (double)numeroDeIntervalos, 4);
+
+            double limiteInferior = 0;
+
+            double frecuenciaEsperada = Math.Round((double)cantidadDeNumerosAGenerar / (double)numeroDeIntervalos, 5);
+
+            // armado de intervalos
+            for (int i = 0; i < numeroDeIntervalos; i++)
+            {
+                Intervalo intervalo = new Intervalo();
+
+                intervalo.numero = i + 1;
+                intervalo.limiteInferior = limiteInferior;
+                intervalo.limiteSuperior = Math.Round(limiteInferior + tamanioIntervalo, 5);
+                intervalo.frecuenciaEsperada = frecuenciaEsperada;
+
+                limiteInferior = intervalo.limiteSuperior;
+
+                if (i + 1 == numeroDeIntervalos) {
+                    intervalo.limiteSuperior = 1;
+                }
+
+                intervalos.Add(intervalo);
+            }
+
+            foreach (var numeroGenerado in numeros)
+            {
+                float numero = float.Parse(numeroGenerado);
+                for (int j = 0; j < intervalos.Count; j++)
+                {
+                    if (intervalos[j].limiteSuperior > numero)
+                    {
+                        intervalos[j].frecuenciaObservada++;
+                        break;
+                    }
+
+                    if (j + 1 == intervalos.Count && intervalos[j].limiteSuperior >= numero) {
+                        intervalos[j].frecuenciaObservada++;
+                    }
+                }
+            }
+
+            cargarGrillaIntervalos(intervalos);
+
+            graficar();
+        }
+
+        private void cargarGrillaIntervalos(List<Intervalo> intervalos)
+        {
+            DataTable tabla = new DataTable();
+
+            tabla.Columns.Add("Intervalo");
+            tabla.Columns.Add("FO");
+            tabla.Columns.Add("FE");
+            tabla.Columns.Add("DifFrec");
+            tabla.Columns.Add("DifFrecCuadrado");
+            tabla.Columns.Add("chiCuadrado");
+            tabla.Columns.Add("chiCuadrado (A)");
+
+            double acumulador = 0;
+
+            DataRow fila;
+
+            foreach (var intervalo in intervalos)
+            {
+                fila = tabla.NewRow();
+
+                fila["Intervalo"] = "[" + intervalo.limiteInferior + " ; " + intervalo.limiteSuperior + ")";
+                fila["FO"] = intervalo.frecuenciaObservada.ToString("0.0000");
+                fila["FE"] = intervalo.frecuenciaEsperada.ToString("0.0000");
+                fila["DifFrec"] = intervalo.diferenciaDeFrecuencias().ToString("0.0000");
+                fila["DifFrecCuadrado"] = intervalo.diferenciaCuadradaDeFrecuencias().ToString("0.0000");
+                fila["chiCuadrado"] = intervalo.chiCuadradoIntervalo().ToString("0.0000");
+
+                acumulador += intervalo.chiCuadradoIntervalo();
+                fila["chiCuadrado (A)"] = acumulador.ToString("0.0000");
+
+                tabla.Rows.Add(fila);
+            }
+
+            grdPuntoB.DataSource = tabla;
+        }
+
+        private void label5_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void graficar()
+        {
+            generarPaleta();
+
+            int maxValue = 0;
+            var chart = grafico.ChartAreas[0];
+            chart.AxisX.CustomLabels.Clear();
+            chart.AxisX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Number;
+            chart.AxisX.Minimum = 0;
+            chart.AxisY.Minimum = 0;
+            chart.AxisX.Maximum = 1;
+
+            foreach (Intervalo intervalo in intervalos)
+            {
+                if (intervalo.frecuenciaObservada > maxValue)
+                {
+                    maxValue = intervalo.frecuenciaObservada;
+                }
+
+                double media = Math.Round((intervalo.limiteInferior + intervalo.limiteSuperior) / 2, 2);
+                media = Math.Truncate(media * 10000) / 10000;
+
+                chart.AxisX.CustomLabels.Add(intervalo.limiteInferior, intervalo.limiteSuperior, intervalo.limiteInferior + " - " + intervalo.limiteSuperior);
+
+                grafico.Series[FRECUENCIA_OBSERVADA].Points.AddXY(media, intervalo.frecuenciaObservada);
+                grafico.Series[FRECUENCIA_ESPERADA].Points.AddXY(media, intervalo.frecuenciaEsperada);
+            }
+
+            chart.AxisY.Maximum = maxValue * 1.1;
+        }
+
+
+        private void generarPaleta()
+        {
+            grafico.Palette = ChartColorPalette.Excel;
+            grafico.Titles.Clear();
+            grafico.Titles.Add("FRECUENCIAS OBSERVADAS VS ESPERADAS");
+            grafico.Series.Clear();
+
+            Series serieFObservada = new Series();
+            serieFObservada.Name = FRECUENCIA_OBSERVADA;
+            grafico.Series.Add(serieFObservada);
+
+            Series serieFEsperada = new Series();
+            serieFEsperada.Name = FRECUENCIA_ESPERADA;
+            grafico.Series.Add(serieFEsperada);
+        }
+
     }
 }

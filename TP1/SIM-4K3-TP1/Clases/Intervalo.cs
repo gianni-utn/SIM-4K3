@@ -14,6 +14,7 @@ namespace SIM_4K3_TP1.Clases
         public double limiteSuperior { get; set; }
         public int frecuenciaObservada { get; set; }
         public double frecuenciaEsperada { get; set; }
+        public double chicuadradoAcumulado { get; set; }
         public double diferenciaDeFrecuencias()
         {
             return frecuenciaEsperada - frecuenciaObservada;
