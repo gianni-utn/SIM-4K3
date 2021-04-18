@@ -31,6 +31,8 @@ namespace TP3
             InitializeComponent();
             popularComboDistribucion();
             grafico.Visible = false;
+            grafico.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
+            tabControl1.Dock = DockStyle.Fill;
         }
 
         private void popularComboDistribucion() {
@@ -149,7 +151,6 @@ namespace TP3
                 default:
                     MessageBox.Show("Debe seleccionar una distribucion.", "Error", MessageBoxButtons.OK);
                     return false;
-                    break;
             }
 
             return true;
