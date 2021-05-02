@@ -37,7 +37,7 @@ namespace Clases
         public static double[] generarNormal(int tamanioMuestra, double media, double desviacion)
         {
             double pi = Math.PI;
-            RND = new Random();
+            //RND = new Random();
 
             double[] v = new double[tamanioMuestra];
 
