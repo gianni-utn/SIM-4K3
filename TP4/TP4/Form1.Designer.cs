@@ -41,55 +41,62 @@
             // 
             // txtSemanasASimular
             // 
-            this.txtSemanasASimular.Location = new System.Drawing.Point(180, 23);
+            this.txtSemanasASimular.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            this.txtSemanasASimular.Location = new System.Drawing.Point(240, 23);
             this.txtSemanasASimular.Name = "txtSemanasASimular";
-            this.txtSemanasASimular.Size = new System.Drawing.Size(60, 20);
+            this.txtSemanasASimular.Size = new System.Drawing.Size(60, 24);
             this.txtSemanasASimular.TabIndex = 8;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.label2.Location = new System.Drawing.Point(21, 26);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(153, 13);
+            this.label2.Size = new System.Drawing.Size(219, 18);
             this.label2.TabIndex = 9;
-            this.label2.Text = "Cantidad de semanas a simular";
+            this.label2.Text = "Cantidad de semanas a simular:";
             // 
             // txtIteracionesAPartirDe
             // 
-            this.txtIteracionesAPartirDe.Location = new System.Drawing.Point(524, 23);
+            this.txtIteracionesAPartirDe.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            this.txtIteracionesAPartirDe.Location = new System.Drawing.Point(844, 23);
             this.txtIteracionesAPartirDe.Name = "txtIteracionesAPartirDe";
-            this.txtIteracionesAPartirDe.Size = new System.Drawing.Size(41, 20);
+            this.txtIteracionesAPartirDe.Size = new System.Drawing.Size(41, 24);
             this.txtIteracionesAPartirDe.TabIndex = 26;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(288, 26);
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            this.label1.Location = new System.Drawing.Point(536, 26);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(45, 13);
+            this.label1.Size = new System.Drawing.Size(60, 18);
             this.label1.TabIndex = 27;
-            this.label1.Text = "Mostrar ";
+            this.label1.Text = "Mostrar";
             // 
             // txtIteraciones
             // 
-            this.txtIteraciones.Location = new System.Drawing.Point(329, 23);
+            this.txtIteraciones.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            this.txtIteraciones.Location = new System.Drawing.Point(594, 23);
             this.txtIteraciones.Name = "txtIteraciones";
-            this.txtIteraciones.Size = new System.Drawing.Size(40, 20);
+            this.txtIteraciones.Size = new System.Drawing.Size(40, 24);
             this.txtIteraciones.TabIndex = 28;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(372, 26);
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            this.label3.Location = new System.Drawing.Point(634, 26);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(150, 13);
+            this.label3.Size = new System.Drawing.Size(210, 18);
             this.label3.TabIndex = 29;
             this.label3.Text = "semanas a partir de la semana";
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(628, 17);
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            this.button1.Location = new System.Drawing.Point(1188, 20);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(160, 31);
             this.button1.TabIndex = 30;
@@ -102,14 +109,14 @@
             this.grdSimulacion.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.grdSimulacion.Location = new System.Drawing.Point(24, 62);
             this.grdSimulacion.Name = "grdSimulacion";
-            this.grdSimulacion.Size = new System.Drawing.Size(1113, 345);
+            this.grdSimulacion.Size = new System.Drawing.Size(1324, 604);
             this.grdSimulacion.TabIndex = 31;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1160, 450);
+            this.ClientSize = new System.Drawing.Size(1360, 729);
             this.Controls.Add(this.grdSimulacion);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
