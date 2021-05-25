@@ -18,6 +18,8 @@ namespace clases
         public double tiempo_llegada_mantenimiento { get; set; }
         public double prox_llegada_mantenimiento { get; set; }
         public double[] rnd_mantenimiento { get; set; }
+        public double rnd1_mantenimiento { get; set; }
+        public double rnd2_mantenimiento { get; set; }
         public double[] tiempo_mantenimiento { get; set; }
         public int maquinas_mantenidas { get; set; }
         public double[] fin_mantenimiento { get; set; }
@@ -52,6 +54,28 @@ namespace clases
             return null;
         }
 
+        public Maquina getMaquinaParaMantener()
+        {
+            foreach (var maquina in this.maquinas)
+            {
+                if (maquina.estado == "Libre" && !maquina.mantenimiento)
+                    return maquina;
+            }
+
+            return null;
+        }
+
+        public Boolean mantenimientoTermino()
+        {
+            foreach (var maquina in this.maquinas)
+            {
+                if (!maquina.mantenimiento)
+                    return false;
+            }
+
+            return true;
+        }
+
         public Alumno getAlumnoEsperando()
         {
             foreach (var alumno in this.alumnos)
@@ -61,6 +85,15 @@ namespace clases
             }
 
             return null;
+        }
+
+        public void reiniciarMantenimientoMaquinas()
+        {
+            foreach (var maquina in this.maquinas)
+            {
+                maquina.mantenimiento = false;
+                maquina.fin_mantenimiento = 0;
+            }
         }
 
         internal Maquina getMaquinaPorNro(int nro_maquina)

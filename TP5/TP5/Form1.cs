@@ -102,6 +102,7 @@ namespace TP5
             actual.fin_mantenimiento = new double[6];
             actual.personal_mantenimiento = new Mantenimiento("Descanso");
             actual.maquinas_mantenidas = 0;
+            actual.reiniciarMantenimientoMaquinas();
             proxLlegadaMantenimiento();
         }
 
@@ -180,7 +181,7 @@ namespace TP5
         private void ocuparMaquinaOLiberar(Maquina maquina)
         {
             // Verificar si mantenimiento esta esperando
-            if (actual.personal_mantenimiento.estado == "Esperando maquina")
+            if (actual.personal_mantenimiento.estado == "Esperando maquina" && !maquina.mantenimiento)
             {
                 mantenerMaquina(maquina);
             }
@@ -191,6 +192,7 @@ namespace TP5
 
                 calcularInscripcion();
                 maquina.fin_inscripcion = actual.fin_incripcion;
+                maquina.estado = "Ocupada";
                 alumno_esperando.estado = "Inscribiendo";
                 alumno_esperando.maquina = maquina;
                 actual.prox_eventos.Add(new Evento("Fin Inscripcion", actual.fin_incripcion, maquina.nro));
@@ -316,7 +318,7 @@ namespace TP5
 
         private void mantenerOEsperar()
         {
-            Maquina maquina = actual.getMaquinaLibre();
+            Maquina maquina = actual.getMaquinaParaMantener();
             if (!(maquina is null))
             {
                 mantenerMaquina(maquina);
@@ -330,11 +332,13 @@ namespace TP5
 
         private void mantenerMaquina(Maquina maquina)
         {
-            maquina.estado = "Ocupada";
+            maquina.estado = "Mantenimiento";
             actual.personal_mantenimiento.estado = "Manteniendo maquina";
             double tiempo_mantienimiento = actual.tiempo_mantenimiento[actual.maquinas_mantenidas];
             double fin_mantenimiento = tiempo_mantienimiento + actual.reloj;
-            actual.fin_mantenimiento[actual.maquinas_mantenidas] = fin_mantenimiento;
+            maquina.fin_mantenimiento = fin_mantenimiento;
+            maquina.mantenimiento = true;
+            //actual.fin_mantenimiento[actual.maquinas_mantenidas] = fin_mantenimiento;
             actual.prox_eventos.Add(new Evento("Fin Mantenimiento", fin_mantenimiento, maquina.nro));
         }
 
@@ -346,15 +350,17 @@ namespace TP5
             // ocupar maquina mantenida para inscripcion o liberar
             ocuparMaquinaOLiberar(maquina);
 
-            if (actual.maquinas_mantenidas < 5)
-            {
-                // iniciar nuevo mantenimiento o esperar
-                mantenerOEsperar();
-                // Fin del mantenimiento
-            } else
+            // Validar si termino el mantenimiento
+            if (actual.mantenimientoTermino())
             {
                 // Fin del mantenimiento
                 reiniciarMantenimiento();
+            } else
+            {
+
+                // iniciar nuevo mantenimiento o esperar
+                mantenerOEsperar();
+ 
             }
         }
 
@@ -385,25 +391,34 @@ namespace TP5
             tabla.Columns.Add("Tiempo Man 4");
             tabla.Columns.Add("Tiempo Man 5");
 
-            tabla.Columns.Add("Fin Man 1");
-            tabla.Columns.Add("Fin Man 2");
-            tabla.Columns.Add("Fin Man 3");
-            tabla.Columns.Add("Fin Man 4");
-            tabla.Columns.Add("Fin Man 5");
 
             tabla.Columns.Add("Estado Mantenimiento");
             tabla.Columns.Add("Maquinas Mantenidas");
 
             tabla.Columns.Add("M1 - Estado");
             tabla.Columns.Add("M1 - Fin inscripcion");
+            tabla.Columns.Add("M1 - Mantenimiento");
+            tabla.Columns.Add("M1 - Fin Mantenimiento");
+
             tabla.Columns.Add("M2 - Estado");
             tabla.Columns.Add("M2 - Fin inscripcion");
+            tabla.Columns.Add("M2 - Mantenimiento");
+            tabla.Columns.Add("M2 - Fin Mantenimiento");
+
             tabla.Columns.Add("M3 - Estado");
             tabla.Columns.Add("M3 - Fin inscripcion");
+            tabla.Columns.Add("M3 - Mantenimiento");
+            tabla.Columns.Add("M3 - Fin Mantenimiento");
+
             tabla.Columns.Add("M4 - Estado");
             tabla.Columns.Add("M4 - Fin inscripcion");
+            tabla.Columns.Add("M4 - Mantenimiento");
+            tabla.Columns.Add("M4 - Fin Mantenimiento");
+
             tabla.Columns.Add("M5 - Estado");
             tabla.Columns.Add("M5 - Fin inscripcion");
+            tabla.Columns.Add("M5 - Mantenimiento");
+            tabla.Columns.Add("M5 - Fin Mantenimiento");
 
             tabla.Columns.Add("Cola alumnos espera");
             tabla.Columns.Add("Cantidad alumnos inscriptos");
@@ -448,26 +463,33 @@ namespace TP5
                 fila["Tiempo Man " + num] = value;
             }
 
-            for (int i = 0; i < 5; i++)
-            {
-                int num = i + 1;
-                string value = actual.rnd_mantenimiento is null ? "-" : actual.fin_mantenimiento[i] + "";
-                fila["Fin Man " + num] = value;
-            }
-
             fila["Estado Mantenimiento"] = actual.personal_mantenimiento.estado;
             fila["Maquinas Mantenidas"] = actual.maquinas_mantenidas;
 
             fila["M1 - Estado"] = maquina1.estado;
             fila["M1 - Fin inscripcion"] = maquina1.fin_inscripcion;
+            fila["M1 - Mantenimiento"] = maquina1.mantenimiento;
+            fila["M1 - Fin Mantenimiento"] = maquina1.fin_mantenimiento;
+
             fila["M2 - Estado"] = maquina2.estado;
             fila["M2 - Fin inscripcion"] = maquina2.fin_inscripcion;
+            fila["M2 - Mantenimiento"] = maquina2.mantenimiento;
+            fila["M2 - Fin Mantenimiento"] = maquina2.fin_mantenimiento;
+
             fila["M3 - Estado"] = maquina3.estado;
             fila["M3 - Fin inscripcion"] = maquina3.fin_inscripcion;
+            fila["M3 - Mantenimiento"] = maquina3.mantenimiento;
+            fila["M3 - Fin Mantenimiento"] = maquina3.fin_mantenimiento;
+
             fila["M4 - Estado"] = maquina4.estado;
             fila["M4 - Fin inscripcion"] = maquina4.fin_inscripcion;
+            fila["M4 - Mantenimiento"] = maquina4.mantenimiento;
+            fila["M4 - Fin Mantenimiento"] = maquina4.fin_mantenimiento;
+
             fila["M5 - Estado"] = maquina5.estado;
             fila["M5 - Fin inscripcion"] = maquina5.fin_inscripcion;
+            fila["M5 - Mantenimiento"] = maquina5.mantenimiento;
+            fila["M5 - Fin Mantenimiento"] = maquina5.fin_mantenimiento;
 
             fila["Cola alumnos espera"] = actual.cola_alumnos;
             fila["Cantidad alumnos inscriptos"] = actual.cant_alumnos_inscriptos;
