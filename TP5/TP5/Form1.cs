@@ -84,7 +84,7 @@ namespace TP5
             proxLlegadaAlumno();
 
             // llegada mantenimiento
-            // proxLlegadaMantenimiento();
+            reiniciarMantenimiento();
 
             // contadores y acumuladores
             actual.cant_alumnos_inscriptos = 0;
@@ -93,6 +93,16 @@ namespace TP5
             actual.cant_horas = 0;
             actual.prom_insc_por_hora_y_maq = 0;
             actual.cola_alumnos = 0;
+        }
+
+        private void reiniciarMantenimiento()
+        {
+            actual.rnd_mantenimiento = new double[6];
+            actual.tiempo_mantenimiento = new double[6];
+            actual.fin_mantenimiento = new double[6];
+            actual.personal_mantenimiento = new Mantenimiento("Descanso");
+            actual.maquinas_mantenidas = 0;
+            proxLlegadaMantenimiento();
         }
 
         private void proxLlegadaMantenimiento()
@@ -140,6 +150,10 @@ namespace TP5
                     llegadaMantenimiento();
                     break;
 
+                case "Fin Mantenimiento":
+                    finMantenimiento(evento.nro_referencia);
+                    break;
+
                 default:
                     break;
             }
@@ -160,8 +174,18 @@ namespace TP5
             // incrementar cant inscriptos
             actual.cant_alumnos_inscriptos++;
 
+            ocuparMaquinaOLiberar(maquina);
+        }
+
+        private void ocuparMaquinaOLiberar(Maquina maquina)
+        {
+            // Verificar si mantenimiento esta esperando
+            if (actual.personal_mantenimiento.estado == "Esperando maquina")
+            {
+                mantenerMaquina(maquina);
+            }
             // verificar si hay gente en cola
-            if (actual.cola_alumnos > 0)
+            else if (actual.cola_alumnos > 0) 
             {
                 Alumno alumno_esperando = actual.getAlumnoEsperando();
 
@@ -172,7 +196,8 @@ namespace TP5
                 actual.prox_eventos.Add(new Evento("Fin Inscripcion", actual.fin_incripcion, maquina.nro));
                 actual.cola_alumnos--;
             }
-            else {
+            else
+            {
                 maquina.estado = "Libre";
                 maquina.fin_inscripcion = null;
             }
@@ -226,6 +251,11 @@ namespace TP5
             actual.cola_alumnos = anterior.cola_alumnos;
             actual.prox_llegada_alumno = anterior.prox_llegada_alumno;
             actual.prox_llegada_mantenimiento = anterior.prox_llegada_mantenimiento;
+            actual.rnd_mantenimiento = anterior.rnd_mantenimiento;
+            actual.tiempo_mantenimiento = anterior.tiempo_mantenimiento;
+            actual.fin_mantenimiento = anterior.fin_mantenimiento;
+            actual.personal_mantenimiento = anterior.personal_mantenimiento;
+            actual.maquinas_mantenidas = anterior.maquinas_mantenidas;
         }
 
         private void llegadaAlumno() {
@@ -269,10 +299,66 @@ namespace TP5
             actual.fin_incripcion = actual.tiempo_incripcion + actual.reloj;
         }
 
+        private void calcularTiemposMantenimiento()
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                actual.rnd_mantenimiento[i] = random.NextDouble();
+            }
+            actual.tiempo_mantenimiento = DistribucionesContinuas.generarNormal(actual.rnd_mantenimiento, 3, 0.17);
+        }
+
         private void llegadaMantenimiento()
         {
-            actual.cant_alumnos_que_llegan = anterior.cant_alumnos_que_llegan;
+            calcularTiemposMantenimiento();
+            mantenerOEsperar();
         }
+
+        private void mantenerOEsperar()
+        {
+            Maquina maquina = actual.getMaquinaLibre();
+            if (!(maquina is null))
+            {
+                mantenerMaquina(maquina);
+            }
+            else
+            {
+                actual.personal_mantenimiento.estado = "Esperando maquina";
+            }
+        }
+
+
+        private void mantenerMaquina(Maquina maquina)
+        {
+            maquina.estado = "Ocupada";
+            actual.personal_mantenimiento.estado = "Manteniendo maquina";
+            double tiempo_mantienimiento = actual.tiempo_mantenimiento[actual.maquinas_mantenidas];
+            double fin_mantenimiento = tiempo_mantienimiento + actual.reloj;
+            actual.fin_mantenimiento[actual.maquinas_mantenidas] = fin_mantenimiento;
+            actual.prox_eventos.Add(new Evento("Fin Mantenimiento", fin_mantenimiento, maquina.nro));
+        }
+
+        private void finMantenimiento(int nro_maquina)
+        {
+            actual.maquinas_mantenidas++;
+            // obtener maquina mantenida
+            Maquina maquina = actual.getMaquinaPorNro(nro_maquina);
+            // ocupar maquina mantenida para inscripcion o liberar
+            ocuparMaquinaOLiberar(maquina);
+
+            if (actual.maquinas_mantenidas < 5)
+            {
+                // iniciar nuevo mantenimiento o esperar
+                mantenerOEsperar();
+                // Fin del mantenimiento
+            } else
+            {
+                // Fin del mantenimiento
+                reiniciarMantenimiento();
+            }
+        }
+
+
         private void cargarColumnas()
         {
             tabla.Columns.Add("# Fila");
@@ -285,7 +371,29 @@ namespace TP5
             tabla.Columns.Add("RND Insc");
             tabla.Columns.Add("Tiempo insc");
             tabla.Columns.Add("Fin inscripcion");
-            
+
+            tabla.Columns.Add("RND1 Man");
+            tabla.Columns.Add("RND2 Man");
+            tabla.Columns.Add("RND3 Man");
+            tabla.Columns.Add("RND4 Man");
+            tabla.Columns.Add("RND5 Man");
+            tabla.Columns.Add("RND6 Man");
+
+            tabla.Columns.Add("Tiempo Man 1");
+            tabla.Columns.Add("Tiempo Man 2");
+            tabla.Columns.Add("Tiempo Man 3");
+            tabla.Columns.Add("Tiempo Man 4");
+            tabla.Columns.Add("Tiempo Man 5");
+
+            tabla.Columns.Add("Fin Man 1");
+            tabla.Columns.Add("Fin Man 2");
+            tabla.Columns.Add("Fin Man 3");
+            tabla.Columns.Add("Fin Man 4");
+            tabla.Columns.Add("Fin Man 5");
+
+            tabla.Columns.Add("Estado Mantenimiento");
+            tabla.Columns.Add("Maquinas Mantenidas");
+
             tabla.Columns.Add("M1 - Estado");
             tabla.Columns.Add("M1 - Fin inscripcion");
             tabla.Columns.Add("M2 - Estado");
@@ -325,6 +433,30 @@ namespace TP5
             fila["RND Insc"] = actual.rnd_incripcion.ToString("0.000");
             fila["Tiempo insc"] = actual.tiempo_incripcion;
             fila["Fin inscripcion"] = actual.fin_incripcion;
+
+            for (int i = 0; i < 6; i++)
+            {
+                int num = i + 1;
+                string value = actual.rnd_mantenimiento is null ? "-" : actual.rnd_mantenimiento[i] + "";
+                fila["RND" + num + " Man"] = value;
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                int num = i + 1;
+                string value = actual.rnd_mantenimiento is null ? "-" : actual.tiempo_mantenimiento[i] + "";
+                fila["Tiempo Man " + num] = value;
+            }
+
+            for (int i = 0; i < 5; i++)
+            {
+                int num = i + 1;
+                string value = actual.rnd_mantenimiento is null ? "-" : actual.fin_mantenimiento[i] + "";
+                fila["Fin Man " + num] = value;
+            }
+
+            fila["Estado Mantenimiento"] = actual.personal_mantenimiento.estado;
+            fila["Maquinas Mantenidas"] = actual.maquinas_mantenidas;
 
             fila["M1 - Estado"] = maquina1.estado;
             fila["M1 - Fin inscripcion"] = maquina1.fin_inscripcion;

@@ -8,3 +8,13 @@ C:\Users\Gianni\source\repos\SIM-4K3\TP5\TP5\obj\Debug\TP5.csproj.GenerateResour
 C:\Users\Gianni\source\repos\SIM-4K3\TP5\TP5\obj\Debug\TP5.csproj.CoreCompileInputs.cache
 C:\Users\Gianni\source\repos\SIM-4K3\TP5\TP5\obj\Debug\TP5.exe
 C:\Users\Gianni\source\repos\SIM-4K3\TP5\TP5\obj\Debug\TP5.pdb
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\bin\Debug\TP5.exe.config
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\bin\Debug\TP5.exe
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\bin\Debug\TP5.pdb
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\obj\Debug\TP5.csprojAssemblyReference.cache
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\obj\Debug\TP5.Form1.resources
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\obj\Debug\TP5.Properties.Resources.resources
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\obj\Debug\TP5.csproj.GenerateResource.cache
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\obj\Debug\TP5.csproj.CoreCompileInputs.cache
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\obj\Debug\TP5.exe
+C:\Users\francofadini\Desktop\SIM-4K3\TP5\TP5\obj\Debug\TP5.pdb

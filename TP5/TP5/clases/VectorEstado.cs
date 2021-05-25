@@ -17,10 +17,10 @@ namespace clases
         public double rnd_llegada_mantenimiento { get; set; }
         public double tiempo_llegada_mantenimiento { get; set; }
         public double prox_llegada_mantenimiento { get; set; }
-        public double rnd1_mantenimiento { get; set; }
-        public double rnd2_mantenimiento { get; set; }
-        public double tiempo_mantenimiento { get; set; }
-        public double fin_mantenimiento { get; set; }
+        public double[] rnd_mantenimiento { get; set; }
+        public double[] tiempo_mantenimiento { get; set; }
+        public int maquinas_mantenidas { get; set; }
+        public double[] fin_mantenimiento { get; set; }
         public int cola_alumnos { get; set; }
         public int cant_alumnos_inscriptos { get; set; }
         public int cant_alumnos_no_ingresan { get; set; }

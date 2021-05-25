@@ -8,6 +8,11 @@ namespace clases
 {
     class Mantenimiento
     {
+        public Mantenimiento(string estado)
+        {
+            this.estado = estado;
+        }
+
         public string estado { get; set; }
 
     }
