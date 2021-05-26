@@ -17,6 +17,7 @@ namespace TP5
         private int iteraciones;
         private double iteracionesAPartirDe;
         private Random random;
+        private double[] rnd_mantenimiento;
 
         VectorEstado anterior;
         VectorEstado actual;
@@ -33,6 +34,9 @@ namespace TP5
             random = new Random();
             tabla.Clear();
             getValores();
+
+            txt_prom_uso.Text = formatearDouble(actual.prom_insc_por_hora_y_maq);
+            prom_alumnos_regresan.Text = Math.Round(actual.porcentaje_de_alumnos_regresan, 2).ToString("0.00") + " %";
         }
         private void getValores()
         {
@@ -43,16 +47,19 @@ namespace TP5
             // Configuro el dia 0
             actual = new VectorEstado();
             simularFilaInicial();
-            DataRow fila = null;
-            
-            
+            if(iteracionesAPartirDe == 0)
+                imprimirFila();
+
+            int aux_fila = 0;
+
             for (int nroFilaSimulada = 1; nroFilaSimulada <= filasASimular; nroFilaSimulada++)
             {
                 simularFila(nroFilaSimulada);
 
-                if (nroFilaSimulada >= iteracionesAPartirDe && nroFilaSimulada < (iteracionesAPartirDe + iteraciones)) {
+                if (actual.reloj >= iteracionesAPartirDe && nroFilaSimulada < (aux_fila + iteraciones)) {
                     imprimirFila();
-
+                    if (aux_fila == 0)
+                        aux_fila = actual.nro_fila;
                 }
 
                 if (nroFilaSimulada == filasASimular)
@@ -60,6 +67,10 @@ namespace TP5
             }
 
             grdSimulacion.DataSource = tabla;
+            grdSimulacion.Columns["# Fila"].Frozen = true;
+            grdSimulacion.Columns["Evento"].Frozen = true;
+            grdSimulacion.Columns["Reloj"].Frozen = true;
+
         }
 
         private void simularFilaInicial() {
@@ -97,10 +108,8 @@ namespace TP5
 
         private void reiniciarMantenimiento()
         {
-            actual.rnd_mantenimiento = new double[6];
-            actual.tiempo_mantenimiento = new double[6];
-            actual.fin_mantenimiento = new double[6];
-            actual.personal_mantenimiento = new Mantenimiento("Descanso");
+            this.rnd_mantenimiento = new double[6];
+            actual.personal_mantenimiento = new Mantenimiento("");
             actual.maquinas_mantenidas = 0;
             actual.reiniciarMantenimientoMaquinas();
             proxLlegadaMantenimiento();
@@ -132,6 +141,7 @@ namespace TP5
             Evento evento = actual.getProximoEvento();
             actual.evento = evento.nombre;
             actual.reloj = evento.tiempo;
+            actual.cant_horas = actual.reloj / 60;
 
             switch (actual.evento)
             {
@@ -161,6 +171,8 @@ namespace TP5
 
             actual.prox_eventos.Remove(evento);
 
+            actual.prom_insc_por_hora_y_maq = actual.cant_alumnos_inscriptos / (actual.cant_horas * 5);
+            actual.porcentaje_de_alumnos_regresan = (double) ((double)actual.cant_alumnos_no_ingresan / (double) actual.cant_alumnos_que_llegan) * (double) 100;
         }
 
         private void finInscripcion(int nro_maquina)
@@ -253,9 +265,8 @@ namespace TP5
             actual.cola_alumnos = anterior.cola_alumnos;
             actual.prox_llegada_alumno = anterior.prox_llegada_alumno;
             actual.prox_llegada_mantenimiento = anterior.prox_llegada_mantenimiento;
-            actual.rnd_mantenimiento = anterior.rnd_mantenimiento;
             actual.tiempo_mantenimiento = anterior.tiempo_mantenimiento;
-            actual.fin_mantenimiento = anterior.fin_mantenimiento;
+            actual.tiempos_mantenimiento = anterior.tiempos_mantenimiento;
             actual.personal_mantenimiento = anterior.personal_mantenimiento;
             actual.maquinas_mantenidas = anterior.maquinas_mantenidas;
         }
@@ -305,9 +316,9 @@ namespace TP5
         {
             for (int i = 0; i < 6; i++)
             {
-                actual.rnd_mantenimiento[i] = random.NextDouble();
+                this.rnd_mantenimiento[i] = random.NextDouble();
             }
-            actual.tiempo_mantenimiento = DistribucionesContinuas.generarNormal(actual.rnd_mantenimiento, 3, 0.17);
+            actual.tiempos_mantenimiento = DistribucionesContinuas.generarNormal(this.rnd_mantenimiento, 3, 0.17);
         }
 
         private void llegadaMantenimiento()
@@ -334,19 +345,31 @@ namespace TP5
         {
             maquina.estado = "Mantenimiento";
             actual.personal_mantenimiento.estado = "Manteniendo maquina";
-            double tiempo_mantienimiento = actual.tiempo_mantenimiento[actual.maquinas_mantenidas];
-            double fin_mantenimiento = tiempo_mantienimiento + actual.reloj;
-            maquina.fin_mantenimiento = fin_mantenimiento;
-            maquina.mantenimiento = true;
-            //actual.fin_mantenimiento[actual.maquinas_mantenidas] = fin_mantenimiento;
-            actual.prox_eventos.Add(new Evento("Fin Mantenimiento", fin_mantenimiento, maquina.nro));
+            actual.tiempo_mantenimiento = actual.tiempos_mantenimiento[actual.maquinas_mantenidas];
+            if (actual.maquinas_mantenidas % 2 == 0)
+            {
+                actual.rnd1_mantenimiento = this.rnd_mantenimiento[actual.maquinas_mantenidas];
+                actual.rnd2_mantenimiento = this.rnd_mantenimiento[actual.maquinas_mantenidas + 1];
+            }
+            else {
+                actual.rnd1_mantenimiento = this.rnd_mantenimiento[actual.maquinas_mantenidas - 1];
+                actual.rnd2_mantenimiento = this.rnd_mantenimiento[actual.maquinas_mantenidas];
+            }
+
+
+            maquina.fin_mantenimiento = actual.tiempo_mantenimiento + actual.reloj;
+            maquina.fin_inscripcion = null;
+            actual.prox_eventos.Add(new Evento("Fin Mantenimiento", actual.tiempo_mantenimiento + actual.reloj, maquina.nro));
         }
 
         private void finMantenimiento(int nro_maquina)
         {
             actual.maquinas_mantenidas++;
+            
             // obtener maquina mantenida
             Maquina maquina = actual.getMaquinaPorNro(nro_maquina);
+            maquina.fin_mantenimiento = 0;
+            maquina.mantenimiento = true;
             // ocupar maquina mantenida para inscripcion o liberar
             ocuparMaquinaOLiberar(maquina);
 
@@ -378,18 +401,14 @@ namespace TP5
             tabla.Columns.Add("Tiempo insc");
             tabla.Columns.Add("Fin inscripcion");
 
+            tabla.Columns.Add("RND lleg mant");
+            tabla.Columns.Add("Tiem lleg mant");
+            tabla.Columns.Add("Prox lleg mant");
+               
             tabla.Columns.Add("RND1 Man");
             tabla.Columns.Add("RND2 Man");
-            tabla.Columns.Add("RND3 Man");
-            tabla.Columns.Add("RND4 Man");
-            tabla.Columns.Add("RND5 Man");
-            tabla.Columns.Add("RND6 Man");
 
-            tabla.Columns.Add("Tiempo Man 1");
-            tabla.Columns.Add("Tiempo Man 2");
-            tabla.Columns.Add("Tiempo Man 3");
-            tabla.Columns.Add("Tiempo Man 4");
-            tabla.Columns.Add("Tiempo Man 5");
+            tabla.Columns.Add("Tiempo Man");
 
 
             tabla.Columns.Add("Estado Mantenimiento");
@@ -424,6 +443,7 @@ namespace TP5
             tabla.Columns.Add("Cantidad alumnos inscriptos");
             tabla.Columns.Add("Cantidad alumnos no ingresan");
             tabla.Columns.Add("Cantidad alumnos que llegan");
+            tabla.Columns.Add("Porcentaje de alumnos que regresan");
             tabla.Columns.Add("Promedio insc por hora y maq");
             tabla.Columns.Add("Cnt horas");
 
@@ -441,62 +461,60 @@ namespace TP5
 
             fila["# Fila"] = actual.nro_fila;
             fila["Evento"] = actual.evento;
-            fila["Reloj"] = actual.reloj;
-            fila["RND lleg alumn"] = actual.rnd_llegada_alumno.ToString("0.000");
-            fila["Tiem lleg alumn"] = actual.tiempo_llegada_alumno;
-            fila["Prox llegada alumn"] = actual.prox_llegada_alumno;
-            fila["RND Insc"] = actual.rnd_incripcion.ToString("0.000");
-            fila["Tiempo insc"] = actual.tiempo_incripcion;
-            fila["Fin inscripcion"] = actual.fin_incripcion;
+            fila["Reloj"] = Math.Round(actual.reloj, 3).ToString("0.000");
+            fila["RND lleg alumn"] = formatearDouble(actual.rnd_llegada_alumno);
+            fila["Tiem lleg alumn"] = formatearHora(actual.tiempo_llegada_alumno);
+            fila["Prox llegada alumn"] = formatearHora(actual.prox_llegada_alumno);
+            fila["RND Insc"] = formatearDouble(actual.rnd_incripcion);
+            fila["Tiempo insc"] = formatearHora(actual.tiempo_incripcion);
+            fila["Fin inscripcion"] = formatearHora(actual.fin_incripcion);
 
-            for (int i = 0; i < 6; i++)
-            {
-                int num = i + 1;
-                string value = actual.rnd_mantenimiento is null ? "-" : actual.rnd_mantenimiento[i] + "";
-                fila["RND" + num + " Man"] = value;
-            }
+            fila["RND lleg mant"] = formatearDouble(actual.rnd_llegada_mantenimiento);
+            fila["Tiem lleg mant"] = formatearHora(actual.tiempo_llegada_mantenimiento);
+            fila["Prox lleg mant"] = formatearHora(actual.prox_llegada_mantenimiento);
 
-            for (int i = 0; i < 5; i++)
-            {
-                int num = i + 1;
-                string value = actual.rnd_mantenimiento is null ? "-" : actual.tiempo_mantenimiento[i] + "";
-                fila["Tiempo Man " + num] = value;
-            }
+            fila["RND1 Man"] = formatearDouble(actual.rnd1_mantenimiento);
+            fila["RND2 Man"] = formatearDouble(actual.rnd2_mantenimiento);
+            fila["Tiempo Man"] = formatearHora(actual.tiempo_mantenimiento);
+
 
             fila["Estado Mantenimiento"] = actual.personal_mantenimiento.estado;
             fila["Maquinas Mantenidas"] = actual.maquinas_mantenidas;
 
             fila["M1 - Estado"] = maquina1.estado;
-            fila["M1 - Fin inscripcion"] = maquina1.fin_inscripcion;
+            fila["M1 - Fin inscripcion"] = formatearHora(maquina1.fin_inscripcion);
             fila["M1 - Mantenimiento"] = maquina1.mantenimiento;
-            fila["M1 - Fin Mantenimiento"] = maquina1.fin_mantenimiento;
+            fila["M1 - Fin Mantenimiento"] = formatearHora(maquina1.fin_mantenimiento);
 
             fila["M2 - Estado"] = maquina2.estado;
-            fila["M2 - Fin inscripcion"] = maquina2.fin_inscripcion;
+            fila["M2 - Fin inscripcion"] = formatearHora(maquina2.fin_inscripcion);
             fila["M2 - Mantenimiento"] = maquina2.mantenimiento;
-            fila["M2 - Fin Mantenimiento"] = maquina2.fin_mantenimiento;
+            fila["M2 - Fin Mantenimiento"] = formatearHora(maquina2.fin_mantenimiento);
 
             fila["M3 - Estado"] = maquina3.estado;
-            fila["M3 - Fin inscripcion"] = maquina3.fin_inscripcion;
+            fila["M3 - Fin inscripcion"] = formatearHora(maquina3.fin_inscripcion);
             fila["M3 - Mantenimiento"] = maquina3.mantenimiento;
-            fila["M3 - Fin Mantenimiento"] = maquina3.fin_mantenimiento;
+            fila["M3 - Fin Mantenimiento"] = formatearHora(maquina3.fin_mantenimiento);
 
             fila["M4 - Estado"] = maquina4.estado;
-            fila["M4 - Fin inscripcion"] = maquina4.fin_inscripcion;
+            fila["M4 - Fin inscripcion"] = formatearHora(maquina4.fin_inscripcion);
             fila["M4 - Mantenimiento"] = maquina4.mantenimiento;
-            fila["M4 - Fin Mantenimiento"] = maquina4.fin_mantenimiento;
+            fila["M4 - Fin Mantenimiento"] = formatearHora(maquina4.fin_mantenimiento);
 
             fila["M5 - Estado"] = maquina5.estado;
-            fila["M5 - Fin inscripcion"] = maquina5.fin_inscripcion;
+            fila["M5 - Fin inscripcion"] = formatearHora(maquina5.fin_inscripcion);
             fila["M5 - Mantenimiento"] = maquina5.mantenimiento;
-            fila["M5 - Fin Mantenimiento"] = maquina5.fin_mantenimiento;
+            fila["M5 - Fin Mantenimiento"] = formatearHora(maquina5.fin_mantenimiento);
+
 
             fila["Cola alumnos espera"] = actual.cola_alumnos;
             fila["Cantidad alumnos inscriptos"] = actual.cant_alumnos_inscriptos;
             fila["Cantidad alumnos no ingresan"] = actual.cant_alumnos_no_ingresan;
             fila["Cantidad alumnos que llegan"] = actual.cant_alumnos_que_llegan;
-            fila["Promedio insc por hora y maq"] = actual.prom_insc_por_hora_y_maq;
-            fila["Cnt horas"] = actual.cant_horas;
+            fila["Promedio insc por hora y maq"] = Math.Round(actual.prom_insc_por_hora_y_maq, 3).ToString("0.000");
+            fila["Porcentaje de alumnos que regresan"] = Math.Round(actual.porcentaje_de_alumnos_regresan, 2).ToString("0.00") + " %";
+            
+            fila["Cnt horas"] = formatearDouble(actual.cant_horas);
 
             foreach (var alumno in actual.alumnos)
             {
@@ -506,10 +524,26 @@ namespace TP5
                 }
 
                 fila["A" + alumno.numero + " - Estado"] = alumno.estado;
-                fila["A" + alumno.numero + " - Hora Regreso"] = alumno.hora_regreso;
+                fila["A" + alumno.numero + " - Hora Regreso"] = formatearHora(alumno.hora_regreso);
             }
 
             tabla.Rows.Add(fila);
+        }
+
+        public string formatearDouble(double? numero)
+        {
+            if (numero == 0 || numero is null )
+                return "";
+
+            return Math.Round((double)numero, 3).ToString("0.000");
+        }
+        public string formatearHora(double? minutos)
+        {
+            if (minutos is null || minutos == 0)
+                return "";
+
+            TimeSpan t = TimeSpan.FromMinutes((double) minutos);
+            return string.Format("{0:D2}h:{1:D2}m:{2:D2}s", t.Hours, t.Minutes, t.Seconds);
         }
     }
 }

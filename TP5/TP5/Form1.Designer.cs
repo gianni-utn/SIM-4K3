@@ -36,6 +36,10 @@
             this.txtIteracionesAPartirDe = new System.Windows.Forms.TextBox();
             this.txtFilasASimular = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txt_prom_uso = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.prom_alumnos_regresan = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.grdSimulacion)).BeginInit();
             this.SuspendLayout();
             // 
@@ -64,9 +68,9 @@
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.label3.Location = new System.Drawing.Point(631, 15);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(152, 18);
+            this.label3.Size = new System.Drawing.Size(155, 18);
             this.label3.TabIndex = 37;
-            this.label3.Text = "filas a partir de la hora";
+            this.label3.Text = "filas a partir del minuto";
             // 
             // txtIteraciones
             // 
@@ -89,7 +93,7 @@
             // txtIteracionesAPartirDe
             // 
             this.txtIteracionesAPartirDe.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
-            this.txtIteracionesAPartirDe.Location = new System.Drawing.Point(785, 12);
+            this.txtIteracionesAPartirDe.Location = new System.Drawing.Point(787, 12);
             this.txtIteracionesAPartirDe.Name = "txtIteracionesAPartirDe";
             this.txtIteracionesAPartirDe.Size = new System.Drawing.Size(41, 24);
             this.txtIteracionesAPartirDe.TabIndex = 34;
@@ -112,11 +116,51 @@
             this.label2.TabIndex = 33;
             this.label2.Text = "Cantidad de semanas a simular:";
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(942, 671);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(362, 13);
+            this.label4.TabIndex = 40;
+            this.label4.Text = "Capacidad de inscripción del sistema por hora en promedio (y por máquina):";
+            // 
+            // txt_prom_uso
+            // 
+            this.txt_prom_uso.AutoSize = true;
+            this.txt_prom_uso.Location = new System.Drawing.Point(1310, 671);
+            this.txt_prom_uso.Name = "txt_prom_uso";
+            this.txt_prom_uso.Size = new System.Drawing.Size(25, 13);
+            this.txt_prom_uso.TabIndex = 41;
+            this.txt_prom_uso.Text = "      ";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(620, 671);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(245, 13);
+            this.label5.TabIndex = 42;
+            this.label5.Text = "% de alumnos que se van para regresar más tarde:";
+            // 
+            // prom_alumnos_regresan
+            // 
+            this.prom_alumnos_regresan.AutoSize = true;
+            this.prom_alumnos_regresan.Location = new System.Drawing.Point(871, 671);
+            this.prom_alumnos_regresan.Name = "prom_alumnos_regresan";
+            this.prom_alumnos_regresan.Size = new System.Drawing.Size(19, 13);
+            this.prom_alumnos_regresan.TabIndex = 43;
+            this.prom_alumnos_regresan.Text = "    ";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1360, 729);
+            this.Controls.Add(this.prom_alumnos_regresan);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.txt_prom_uso);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.grdSimulacion);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
@@ -143,6 +187,10 @@
         private System.Windows.Forms.TextBox txtIteracionesAPartirDe;
         private System.Windows.Forms.TextBox txtFilasASimular;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label txt_prom_uso;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label prom_alumnos_regresan;
     }
 }
 

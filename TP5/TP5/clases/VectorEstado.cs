@@ -17,18 +17,18 @@ namespace clases
         public double rnd_llegada_mantenimiento { get; set; }
         public double tiempo_llegada_mantenimiento { get; set; }
         public double prox_llegada_mantenimiento { get; set; }
-        public double[] rnd_mantenimiento { get; set; }
         public double rnd1_mantenimiento { get; set; }
         public double rnd2_mantenimiento { get; set; }
-        public double[] tiempo_mantenimiento { get; set; }
+        public double tiempo_mantenimiento { get; set; }
+        public double[] tiempos_mantenimiento { get; set; }
         public int maquinas_mantenidas { get; set; }
-        public double[] fin_mantenimiento { get; set; }
         public int cola_alumnos { get; set; }
         public int cant_alumnos_inscriptos { get; set; }
         public int cant_alumnos_no_ingresan { get; set; }
         public int cant_alumnos_que_llegan { get; set; }
         public double prom_insc_por_hora_y_maq { get; set; }
-        public int cant_horas { get; set; }
+        public double porcentaje_de_alumnos_regresan { get; set; }
+        public double cant_horas { get; set; }
         public List<Maquina> maquinas { get; set; }
         public List<Alumno> alumnos { get; set; }
         public Mantenimiento personal_mantenimiento { get; set; }
@@ -92,7 +92,6 @@ namespace clases
             foreach (var maquina in this.maquinas)
             {
                 maquina.mantenimiento = false;
-                maquina.fin_mantenimiento = 0;
             }
         }
 
