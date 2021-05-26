@@ -32,8 +32,14 @@ namespace TP5
         private void button1_Click(object sender, EventArgs e)
         {
             random = new Random();
+            grdSimulacion.DataSource = null;
+            grdSimulacion.Rows.Clear();
             tabla.Clear();
+            GC.Collect();
+
+            grdSimulacion.ColumnHeadersVisible = false;
             getValores();
+            grdSimulacion.ColumnHeadersVisible = false;
 
             txt_prom_uso.Text = formatearDouble(actual.prom_insc_por_hora_y_maq);
             prom_alumnos_regresan.Text = Math.Round(actual.porcentaje_de_alumnos_regresan, 2).ToString("0.00") + " %";

@@ -112,16 +112,16 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.label2.Location = new System.Drawing.Point(18, 15);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(219, 18);
+            this.label2.Size = new System.Drawing.Size(184, 18);
             this.label2.TabIndex = 33;
-            this.label2.Text = "Cantidad de semanas a simular:";
+            this.label2.Text = "Cantidad de filas a simular:";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(942, 671);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(362, 13);
+            this.label4.Size = new System.Drawing.Size(369, 13);
             this.label4.TabIndex = 40;
             this.label4.Text = "Capacidad de inscripción del sistema por hora en promedio (y por máquina):";
             // 
@@ -139,7 +139,7 @@
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(620, 671);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(245, 13);
+            this.label5.Size = new System.Drawing.Size(255, 13);
             this.label5.TabIndex = 42;
             this.label5.Text = "% de alumnos que se van para regresar más tarde:";
             // 
