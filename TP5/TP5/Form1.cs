@@ -39,7 +39,7 @@ namespace TP5
 
             grdSimulacion.ColumnHeadersVisible = false;
             getValores();
-            grdSimulacion.ColumnHeadersVisible = false;
+            grdSimulacion.ColumnHeadersVisible = true;
 
             txt_prom_uso.Text = formatearDouble(actual.prom_insc_por_hora_y_maq);
             prom_alumnos_regresan.Text = Math.Round(actual.porcentaje_de_alumnos_regresan, 2).ToString("0.00") + " %";
