@@ -467,7 +467,7 @@ namespace TP5
 
             fila["# Fila"] = actual.nro_fila;
             fila["Evento"] = actual.evento;
-            fila["Reloj"] = Math.Round(actual.reloj, 3).ToString("0.000");
+            fila["Reloj"] = formatearHora(Math.Round(actual.reloj, 3));
             fila["RND lleg alumn"] = formatearDouble(actual.rnd_llegada_alumno);
             fila["Tiem lleg alumn"] = formatearHora(actual.tiempo_llegada_alumno);
             fila["Prox llegada alumn"] = formatearHora(actual.prox_llegada_alumno);
