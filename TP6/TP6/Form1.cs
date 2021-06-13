@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using clases;
+using TP5.clases;
 
 namespace TP5
 {
@@ -19,14 +20,41 @@ namespace TP5
         private Random random;
         private double[] rnd_mantenimiento;
 
+        private int insc_A;
+        private int insc_B;
+        private int llega_alum_media;
+        private int llega_mant_A;
+        private int llega_mant_B;
+        private double h;
+
+        private double demora_a1000;
+        private double demora_a1500;
+        private double demora_a2000;
+
         VectorEstado anterior;
         VectorEstado actual;
         DataTable tabla = new DataTable();
+
+        Euler e1_anterior;
+        Euler e1_actual;
+        DataTable e1_tabla = new DataTable();
+
+        Euler e2_anterior;
+        Euler e2_actual;
+        DataTable e2_tabla = new DataTable();
+
+        Euler e3_anterior;
+        Euler e3_actual;
+        DataTable e3_tabla = new DataTable();
+
 
         public Form1()
         {
             InitializeComponent();
             cargarColumnas();
+            cargarColumnasE(e1_tabla);
+            cargarColumnasE(e2_tabla);
+            cargarColumnasE(e3_tabla);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -36,20 +64,163 @@ namespace TP5
             grdSimulacion.Rows.Clear();
             tabla.Clear();
             GC.Collect();
-
             grdSimulacion.ColumnHeadersVisible = false;
+            filasASimular = int.Parse(txtFilasASimular.Text);
+            iteraciones = int.Parse(txtIteraciones.Text);
+            iteracionesAPartirDe = double.Parse(txtIteracionesAPartirDe.Text);
+
+            insc_A = int.Parse(txt_insc_A.Text);
+            insc_B = int.Parse(txt_insc_B.Text);
+            llega_alum_media = int.Parse(txt_llega_alum_media.Text);
+            llega_mant_A = int.Parse(txt_llega_mant_media.Text) - int.Parse(txt_llega_mant_mm.Text);
+            llega_mant_B = int.Parse(txt_llega_mant_media.Text) + int.Parse(txt_llega_mant_mm.Text);
+            h = double.Parse(txt_h.Text); //.Parse(txt_h.Text);
+
+
+            // armar tablas
+            
+            armarE1();
+            armarE2();
+            armarE3();
+            
             getValores();
+
             grdSimulacion.ColumnHeadersVisible = true;
 
             txt_prom_uso.Text = formatearDouble(actual.prom_insc_por_hora_y_maq);
             prom_alumnos_regresan.Text = Math.Round(actual.porcentaje_de_alumnos_regresan, 2).ToString("0.00") + " %";
         }
+
+
+        private void armarE1()
+        {
+            e1_actual = new Euler();
+            e1_actual.A_prox = 1000;
+            e1_actual.t_prox = 0;
+
+            do
+            {
+                DataRow fila = e1_tabla.NewRow();
+                e1_anterior = e1_actual;
+                e1_actual = new Euler();
+
+                e1_actual.A = e1_anterior.A_prox;
+                e1_actual.t = e1_anterior.t_prox;
+
+                e1_actual.dA_dt = -68 - (Math.Pow(e1_actual.A, 2) / 1000);
+                e1_actual.t_prox = e1_actual.t + h;
+                e1_actual.A_prox = e1_actual.A + h * e1_actual.dA_dt;
+
+                fila["t"] = Math.Round((double)e1_actual.t, 3).ToString("0.000");
+                fila["A"] = formatearDouble(e1_actual.A);
+                fila["dA / dt"] = formatearDouble(e1_actual.dA_dt);
+                fila["t (i+1)"] = formatearDouble(e1_actual.t_prox);
+                fila["A (i+1)"] = formatearDouble(e1_actual.A_prox);
+
+                e1_tabla.Rows.Add(fila);
+
+            } while (e1_actual.A > 0);
+
+            demora_a1000 = e1_actual.t;
+            grdE1.DataSource = e1_tabla;
+
+            grdE1.Columns["t"].Width = 70;
+            grdE1.Columns["A"].Width = 70;
+            grdE1.Columns["dA / dt"].Width = 70;
+            grdE1.Columns["t (i+1)"].Width = 70;
+            grdE1.Columns["A (i+1)"].Width = 70;
+        }
+
+        private void armarE2()
+        {
+            e2_actual = new Euler();
+            e2_actual.A_prox = 1500;
+            e2_actual.t_prox = 0;
+
+            do
+            {
+                DataRow fila = e2_tabla.NewRow();
+                e2_anterior = e2_actual;
+                e2_actual = new Euler();
+
+                e2_actual.A = e2_anterior.A_prox;
+                e2_actual.t = e2_anterior.t_prox;
+
+                e2_actual.dA_dt = -68 - (Math.Pow(e2_actual.A, 2) / 1500);
+                e2_actual.t_prox = e2_actual.t + h;
+                e2_actual.A_prox = e2_actual.A + h * e2_actual.dA_dt;
+
+                fila["t"] = Math.Round((double)e2_actual.t, 3).ToString("0.000");
+                fila["A"] = formatearDouble(e2_actual.A);
+                fila["dA / dt"] = formatearDouble(e2_actual.dA_dt);
+                fila["t (i+1)"] = formatearDouble(e2_actual.t_prox);
+                fila["A (i+1)"] = formatearDouble(e2_actual.A_prox);
+
+                e2_tabla.Rows.Add(fila);
+
+            } while (e2_actual.A > 0);
+
+            demora_a1500 = e2_actual.t;
+            grdE2.DataSource = e2_tabla;
+            
+            grdE2.Columns["t"].Width = 70;
+            grdE2.Columns["A"].Width = 70;
+            grdE2.Columns["dA / dt"].Width = 70;
+            grdE2.Columns["t (i+1)"].Width = 70;
+            grdE2.Columns["A (i+1)"].Width = 70;
+
+        }
+
+        private void armarE3()
+        {
+            e3_actual = new Euler();
+            e3_actual.A_prox = 2000;
+            e3_actual.t_prox = 0;
+
+            do
+            {
+                DataRow fila = e3_tabla.NewRow();
+                e3_anterior = e3_actual;
+                e3_actual = new Euler();
+
+                e3_actual.A = e3_anterior.A_prox;
+                e3_actual.t = e3_anterior.t_prox;
+
+                e3_actual.dA_dt = -68 - (Math.Pow(e3_actual.A, 2) / 2000);
+                e3_actual.t_prox = e3_actual.t + h;
+                e3_actual.A_prox = e3_actual.A + h * e3_actual.dA_dt;
+
+                fila["t"] = Math.Round((double)e3_actual.t, 3).ToString("0.000");
+                fila["A"] = formatearDouble(e3_actual.A);
+                fila["dA / dt"] = formatearDouble(e3_actual.dA_dt);
+                fila["t (i+1)"] = formatearDouble(e3_actual.t_prox);
+                fila["A (i+1)"] = formatearDouble(e3_actual.A_prox);
+
+                e3_tabla.Rows.Add(fila);
+
+            } while (e3_actual.A > 0);
+
+            demora_a2000 = e3_actual.t;
+            grdE3.DataSource = e3_tabla;
+
+            grdE3.Columns["t"].Width = 70;
+            grdE3.Columns["A"].Width = 70;
+            grdE3.Columns["dA / dt"].Width = 70;
+            grdE3.Columns["t (i+1)"].Width = 70;
+            grdE3.Columns["A (i+1)"].Width = 70;
+
+        }
+        private void cargarColumnasE(DataTable e_tabla)
+        {
+            e_tabla.Columns.Add("t");
+            e_tabla.Columns.Add("A");
+            e_tabla.Columns.Add("dA / dt");
+            e_tabla.Columns.Add("t (i+1)");
+            e_tabla.Columns.Add("A (i+1)");
+        }
+
         private void getValores()
         {
-            filasASimular = int.Parse(txtFilasASimular.Text);
-            iteraciones = int.Parse(txtIteraciones.Text);
-            iteracionesAPartirDe = double.Parse(txtIteracionesAPartirDe.Text);
-
             // Configuro el dia 0
             actual = new VectorEstado();
             simularFilaInicial();
@@ -67,16 +238,12 @@ namespace TP5
                     if (aux_fila == 0)
                         aux_fila = actual.nro_fila;
                 }
-
-                if (nroFilaSimulada == filasASimular)
-                    imprimirFila();
             }
 
             grdSimulacion.DataSource = tabla;
             grdSimulacion.Columns["# Fila"].Frozen = true;
             grdSimulacion.Columns["Evento"].Frozen = true;
             grdSimulacion.Columns["Reloj"].Frozen = true;
-
         }
 
         private void simularFilaInicial() {
@@ -124,7 +291,7 @@ namespace TP5
         private void proxLlegadaMantenimiento()
         {
             actual.rnd_llegada_mantenimiento = random.NextDouble();
-            actual.tiempo_llegada_mantenimiento = DistribucionesContinuas.generarUniforme(57, 63, actual.rnd_llegada_mantenimiento);
+            actual.tiempo_llegada_mantenimiento = DistribucionesContinuas.generarUniforme(llega_mant_A, llega_mant_B, actual.rnd_llegada_mantenimiento);
             actual.prox_llegada_mantenimiento = actual.tiempo_llegada_mantenimiento + actual.reloj;
             actual.prox_eventos.Add(new Evento("Llegada Mantenimiento", actual.prox_llegada_mantenimiento));
         }
@@ -132,7 +299,7 @@ namespace TP5
         private void proxLlegadaAlumno()
         {
             actual.rnd_llegada_alumno = random.NextDouble();
-            actual.tiempo_llegada_alumno = DistribucionesContinuas.generarExponencial(2, actual.rnd_llegada_alumno);
+            actual.tiempo_llegada_alumno = DistribucionesContinuas.generarExponencial(llega_alum_media, actual.rnd_llegada_alumno);
             actual.prox_llegada_alumno = actual.tiempo_llegada_alumno + actual.reloj;
             actual.prox_eventos.Add(new Evento("Llegada Alumno", actual.prox_llegada_alumno));
         }
@@ -271,8 +438,6 @@ namespace TP5
             actual.cola_alumnos = anterior.cola_alumnos;
             actual.prox_llegada_alumno = anterior.prox_llegada_alumno;
             actual.prox_llegada_mantenimiento = anterior.prox_llegada_mantenimiento;
-            actual.tiempo_mantenimiento = anterior.tiempo_mantenimiento;
-            actual.tiempos_mantenimiento = anterior.tiempos_mantenimiento;
             actual.personal_mantenimiento = anterior.personal_mantenimiento;
             actual.maquinas_mantenidas = anterior.maquinas_mantenidas;
         }
@@ -314,10 +479,11 @@ namespace TP5
         private void calcularInscripcion()
         {
             actual.rnd_incripcion = random.NextDouble();
-            actual.tiempo_incripcion = DistribucionesContinuas.generarUniforme(5, 8, actual.rnd_incripcion);
+            actual.tiempo_incripcion = DistribucionesContinuas.generarUniforme(insc_A, insc_B, actual.rnd_incripcion);
             actual.fin_incripcion = actual.tiempo_incripcion + actual.reloj;
         }
 
+        /*
         private void calcularTiemposMantenimiento()
         {
             for (int i = 0; i < 6; i++)
@@ -326,11 +492,12 @@ namespace TP5
             }
             actual.tiempos_mantenimiento = DistribucionesContinuas.generarNormal(this.rnd_mantenimiento, 3, 0.17);
         }
-
+        */
         private void llegadaMantenimiento()
         {
-            calcularTiemposMantenimiento();
+          //  calcularTiemposMantenimiento();
             mantenerOEsperar();
+            actual.prox_llegada_mantenimiento = 0;
         }
 
         private void mantenerOEsperar()
@@ -351,18 +518,25 @@ namespace TP5
         {
             maquina.estado = "Mantenimiento";
             actual.personal_mantenimiento.estado = "Manteniendo maquina";
-            actual.tiempo_mantenimiento = actual.tiempos_mantenimiento[actual.maquinas_mantenidas];
-            if (actual.maquinas_mantenidas % 2 == 0)
+            actual.rnd_cant_archivos = random.NextDouble();
+
+            if (actual.rnd_cant_archivos < 0.33)
             {
-                actual.rnd1_mantenimiento = this.rnd_mantenimiento[actual.maquinas_mantenidas];
-                actual.rnd2_mantenimiento = this.rnd_mantenimiento[actual.maquinas_mantenidas + 1];
+                actual.cant_archivos = 1000;
+                actual.tiempo_mantenimiento = demora_a1000;
+            }
+            else if (actual.rnd_cant_archivos < 0.66)
+            {
+                actual.cant_archivos = 1500;
+                actual.tiempo_mantenimiento = demora_a1500;
             }
             else {
-                actual.rnd1_mantenimiento = this.rnd_mantenimiento[actual.maquinas_mantenidas - 1];
-                actual.rnd2_mantenimiento = this.rnd_mantenimiento[actual.maquinas_mantenidas];
+                actual.cant_archivos = 2000;
+                actual.tiempo_mantenimiento = demora_a2000;
             }
 
-
+            actual.fin_mantenimiento = actual.tiempo_mantenimiento + actual.reloj;
+            
             maquina.fin_mantenimiento = actual.tiempo_mantenimiento + actual.reloj;
             maquina.fin_inscripcion = null;
             actual.prox_eventos.Add(new Evento("Fin Mantenimiento", actual.tiempo_mantenimiento + actual.reloj, maquina.nro));
@@ -411,11 +585,10 @@ namespace TP5
             tabla.Columns.Add("Tiem lleg mant");
             tabla.Columns.Add("Prox lleg mant");
                
-            tabla.Columns.Add("RND1 Man");
-            tabla.Columns.Add("RND2 Man");
-
+            tabla.Columns.Add("RND Cant Archivos");
+            tabla.Columns.Add("Cant Archivos");
             tabla.Columns.Add("Tiempo Man");
-
+            tabla.Columns.Add("Fin Man");
 
             tabla.Columns.Add("Estado Mantenimiento");
             tabla.Columns.Add("Maquinas Mantenidas");
@@ -482,9 +655,10 @@ namespace TP5
             fila["Tiem lleg mant"] = formatearHora(actual.tiempo_llegada_mantenimiento);
             fila["Prox lleg mant"] = formatearHora(actual.prox_llegada_mantenimiento);
 
-            fila["RND1 Man"] = formatearDouble(actual.rnd1_mantenimiento);
-            fila["RND2 Man"] = formatearDouble(actual.rnd2_mantenimiento);
+            fila["RND Cant Archivos"] = formatearDouble(actual.rnd_cant_archivos);
+            fila["Cant Archivos"] = formatearDouble(actual.cant_archivos);
             fila["Tiempo Man"] = formatearHora(actual.tiempo_mantenimiento);
+            fila["Fin Man"] = formatearHora(actual.fin_mantenimiento);
 
 
             fila["Estado Mantenimiento"] = actual.personal_mantenimiento.estado;
